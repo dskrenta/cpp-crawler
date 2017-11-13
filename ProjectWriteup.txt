@@ -1,8 +1,8 @@
 Project Description:
 
-Multithreaded web crawler written in C++ with page ranking abilities designed for use in a search architecture.
+  Multithreaded web crawler written in C++ with page ranking abilities designed for use in a search architecture.
 
-Depending on how far I get during the week I may add recrawl policies and a sample full text search class to demonstate the crawler in action.
+  Depending on how far I get during the week I may add recrawl policies and a sample full text search class to demonstate the crawler in action.
 
 Project Goals:
 
@@ -19,14 +19,33 @@ Project Goals:
 
 Class Descriptions:
 
-Crawler - Main class for project
-WebGraph - Class to represent graph structure of crawled websites
-Url - Class to wrap the url string, provides some helper methods, node for WebGraph
-ThreadPool - Class for managing the thread pool used for multithreaded crawling
-Worker - Worker class for ThreadPool
+  Crawler - Main class for project
+  WebGraph - Class to represent graph structure of crawled websites
+  Url - Class to wrap the url string, provides some helper methods, node for WebGraph
+  ThreadPool - Class for managing the thread pool used for multithreaded crawling
+  Worker - Worker class for ThreadPool
 
 Data Member Descriptions:
 
+  unordered_set hostWhitelist - set for whitelisted hosts
+  unordered_set hostBlackslist - set for blacklisted hosts
+  queue crawlQueue - queue for crawl
+  ThreadPool crawlPool - thread pool for crawler class
+  WebGraph webGraph - web graph for crawler class
+  numPagesCrawled - count of pages crawled
+  vector workers - vector of workers for thread pool for class
+  dequeue tasks - dequeue of tasks as functions
+  mutex queue_mutex - mutual exclusion type for crawlQueue
+  condition_variable condition - condition_variable for threads looking for work
+  bool stop - variable to stop all threads
+  url string - url string
+  vector urlList - node url list for web graph
+  multimap edgeList - edge list for web graph
 
 
-Design Requirement Satisfaction Requirement:
+Design Requirement Satisfaction:
+
+  - More than 2 classes
+  - More than 2 classes have more than 2 data members
+  - File IO for reading hostWhitelist and hostBlacklist, storing crawled pages
+  - Implementation includes various for and while loops
