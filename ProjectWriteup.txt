@@ -42,7 +42,6 @@ Data Member Descriptions:
   vector urlList - node url list for web graph
   multimap edgeList - edge list for web graph
 
-
 Design Requirement Satisfaction:
 
   - More than 2 classes
