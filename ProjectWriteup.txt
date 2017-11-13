@@ -1,0 +1,32 @@
+Project Description:
+
+Multithreaded web crawler written in C++ with page ranking abilities designed for use in a search architecture.
+
+Depending on how far I get during the week I may add recrawl policies and a sample full text search class to demonstate the crawler in action.
+
+Project Goals:
+
+  Personal:
+    - Implement a working web crawler in C++
+    - Store data for eventual searching
+    - Learn about web search technology through simplistic practice
+
+  General:
+    - Fast web crawling through a thread pool architecture
+    - Configurable to allow for different crawling scenarios (host whitelist, host blacklist)
+    - Page rank abilities through the use of a directed graph
+    - Save downloaded HTML content for later processing
+
+Class Descriptions:
+
+Crawler - Main class for project
+WebGraph - Class to represent graph structure of crawled websites
+Url - Class to wrap the url string, provides some helper methods, node for WebGraph
+ThreadPool - Class for managing the thread pool used for multithreaded crawling
+Worker - Worker class for ThreadPool
+
+Data Member Descriptions:
+
+
+
+Design Requirement Satisfaction Requirement:

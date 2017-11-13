@@ -11,17 +11,10 @@
 #include <vector>
 #include <unordered_set>
 #include <queue>
+#include "ThreadPool"
+#include "WebGraph"
 
 using namespace std;
-
-/*
-    vector roots
-    read whitelist file and populate whitelist set
-    read blacklist file and populate blacklist set
-    set dest dir
-
-    set up crawl threads here in another class (init)
-*/
 
 class Crawler {
     public:
@@ -33,12 +26,18 @@ class Crawler {
         );
         ~Crawler();
 
-    private:
-        static bool isValidURL(string &url);
+        void startCrawl();
+        void endCrawl();
+        void logCrawlData();
+        void parseUrls(string);
 
+    private:
         unordered_set <string> hostWhitelist;
         unordered_set <string> hostBlacklist;
         unordered_set <string> seenUrls;
         queue <string> crawlQueue;
+        ThreadPool crawlpool;
+        WebGraph webGraph;
+        int numPagesCrawled = 0;
 };
 #endif // CRAWLER_H
