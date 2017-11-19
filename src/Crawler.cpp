@@ -13,6 +13,7 @@ Crawler::Crawler(
     const int numPagesToCrawl = 50,
     const int concurrencyLimit = 2
 ) {
+    dataDirectory = destDir;
     readFileToSet(hostWhitelistFilename, hostWhitelist);
     readFileToSet(hostBlacklistFilename, hostBlacklist);
     if (numPagesCrawled < numPagesToCrawl) {
@@ -40,6 +41,8 @@ void Crawler::readFileToSet(const string &filename, unordered_set <string> set) 
 
 void Crawler::startCrawl() {
     cout << "Start Crawl" << endl;
+    string command = "curl http://harvix.com -o crawled.txt";
+    system(command.c_str());
 }
 
 void Crawler::endCrawl() {

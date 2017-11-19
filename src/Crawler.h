@@ -17,6 +17,7 @@
 // #include "cpr/cpr.h"
 // #include "ThreadPool.h"
 // #include "WebGraph.h"
+#include <stdlib.h>
 
 using namespace std;
 
@@ -47,5 +48,6 @@ class Crawler {
         // ThreadPool crawlpool;
         // WebGraph webGraph;
         atomic <int> numPagesCrawled {0};
+        string dataDirectory;
 };
 #endif // CRAWLER_H
