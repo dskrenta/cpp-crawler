@@ -9,7 +9,7 @@
 #include <iostream>
 #include <vector>
 #include <thread>
-#include <dequeue>
+#include <deque>
 #include <condition_variable>
 
 using namespace std;
@@ -37,7 +37,7 @@ class ThreadPool {
         friend class Worker;
 
         vector <thread> workers;
-        dequeue <function<void()>> tasks;
+        deque <function<void()>> tasks;
         mutex queue_mutex;
         condition_variable condition;
         bool stop;
