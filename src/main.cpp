@@ -10,8 +10,8 @@ using namespace std;
 
 int main() {
     unordered_set <string> roots;
-    roots.insert("http://en.wikipedia.com");
-    roots.insert("http://news.google.com");
+    roots.insert("http://harvix.com");
+    roots.insert("http://9gag.com");
 
     Crawler crawler(roots, "", "", "data", 50, 4);
 }

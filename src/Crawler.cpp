@@ -39,16 +39,14 @@ void Crawler::readFileToSet(const string &filename, unordered_set <string> set) 
 
 void Crawler::startCrawl() {
     for (unordered_set <string>::iterator it = roots.begin(); it != roots.end(); it++) {
-        pool.schedule([] {
+        pool.schedule([this, it] {
             // cout << "hello" << endl;
-            /*
             stringstream ss;
             size_t generatedHash = h(*it);
             ss << generatedHash;
             string filename = ss.str();
-            string command = "curl " + *it + " -o " + dataDirectory + "/" + filename.c_str();
+            string command = "curl " + *it + " -o " + this->dataDirectory + "/" + filename.c_str();
             system(command.c_str());
-            */
         });
     }
 }
