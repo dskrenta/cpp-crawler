@@ -1,45 +1,39 @@
-// Author: David Skrenta CS1300 Fall 2017
-// Recitation: 210 - Arcadia
-// Assignment 8
-// ThreadPool.h
+#ifndef THREAD_POOL_H
+#define THREAD_POOL_H
 
-#ifndef THEAD_POOL_H
-#define THEAD_POOL_H
-
-#include <iostream>
 #include <vector>
+#include <queue>
 #include <thread>
-#include <deque>
+#include <mutex>
+#include <atomic>
 #include <condition_variable>
+#include <functional>
 
-using namespace std;
 
-class ThreadPool;
-
-class Worker {
-    public:
-        Worker(ThreadPool &s);
-        void operator()();
-
-    private:
-        ThreadPool &pool;
-}
-
+/// \brief Use this class to run tasks in parallel.
 class ThreadPool {
     public:
-        ThreadPool(size_t numThreads);
+        ThreadPool();
+        ThreadPool( size_t threads );
         ~ThreadPool();
 
-        template <class F>
-        void enqueue(F f);
+        /// \brief Initialize the ThreadPool with a number of threads.
+        /// This method does nothing if the thread pool is already running,
+        /// i.e. ThreadPool( size_t ) was called.
+        void initializeWithThreads( size_t threads );
+
+        /// \brief Schedule a task to be executed by a thread immediately.
+        void schedule( const std::function<void()>& );
+
+        /// \brief a blocking function that waits until the threads have processed all the tasks in the queue.
+        void wait() const;
 
     private:
-        friend class Worker;
-
-        vector <thread> workers;
-        deque <function<void()>> tasks;
-        mutex queue_mutex;
-        condition_variable condition;
-        bool stop;
+        std::vector<std::thread>            _workers;
+        std::queue<std::function<void()>>   _taskQueue;
+        std::atomic_uint                    _taskCount;
+        std::mutex                          _mutex;
+        std::condition_variable             _condition;
+        std::atomic_bool                    _stop;
 };
-#endif // THEAD_POOL_H
+#endif // THREAD_POOL_H

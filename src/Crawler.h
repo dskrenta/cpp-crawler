@@ -6,18 +6,18 @@
 #ifndef CRAWLER_H
 #define CRAWLER_H
 
+#include <stdlib.h>
 #include <iostream>
 #include <fstream>
 #include <string>
-// #include <vector>
 #include <unordered_set>
 #include <queue>
 #include <atomic>
+#include <thread>
+#include <sstream>
 
-// #include "cpr/cpr.h"
-// #include "ThreadPool.h"
+#include "ThreadPool.h"
 // #include "WebGraph.h"
-#include <stdlib.h>
 
 using namespace std;
 
@@ -29,7 +29,7 @@ class Crawler {
             const string &hostBlacklistFilename,
             const string &destDir,
             const int numPagesToCrawl,
-            const int concurrencyLimit
+            const size_t concurrencyLimit
         );
         ~Crawler();
 
@@ -41,13 +41,15 @@ class Crawler {
         void parseUrls(string);
 
     private:
+        unordered_set <string> roots;
         unordered_set <string> hostWhitelist;
         unordered_set <string> hostBlacklist;
         unordered_set <string> seenUrls;
         queue <string> crawlQueue;
-        // ThreadPool crawlpool;
+        ThreadPool pool;
         // WebGraph webGraph;
         atomic <int> numPagesCrawled {0};
         string dataDirectory;
+        hash <string> h;
 };
 #endif // CRAWLER_H

@@ -3,17 +3,15 @@
 // Assignment 8
 // main.h
 
-// #include "cpr/cpr.h"
+#include <iostream>
 #include "Crawler.h"
 
 using namespace std;
 
 int main() {
-    // auto response = cpr::Get(cpr::Url{"http://example.com"});
-    // cout << response.text << endl;
     unordered_set <string> roots;
-    roots.insert("en.wikipedia.com");
-    roots.insert("news.google.com");
+    roots.insert("http://en.wikipedia.com");
+    roots.insert("http://news.google.com");
 
-    Crawler crawler(roots, "", "", "../data", 50, 2);
+    Crawler crawler(roots, "", "", "data", 50, 4);
 }

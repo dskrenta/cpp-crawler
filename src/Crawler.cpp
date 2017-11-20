@@ -4,26 +4,24 @@
 // Crawler.cpp
 
 #include "Crawler.h"
+#include "ThreadPool.h"
 
 Crawler::Crawler(
-    unordered_set <string> roots,
+    unordered_set <string> inputRoots,
     const string &hostWhitelistFilename = "",
     const string &hostBlacklistFilename = "",
-    const string &destDir = "../data",
+    const string &destDir = "data",
     const int numPagesToCrawl = 50,
-    const int concurrencyLimit = 2
-) {
+    const size_t concurrencyLimit = 2
+) : pool(concurrencyLimit) {
+    roots = inputRoots;
     dataDirectory = destDir;
     readFileToSet(hostWhitelistFilename, hostWhitelist);
     readFileToSet(hostBlacklistFilename, hostBlacklist);
-    if (numPagesCrawled < numPagesToCrawl) {
-        startCrawl();
-    }
-    endCrawl();
+    startCrawl();
 }
 
 Crawler::~Crawler() {
-
 }
 
 void Crawler::readFileToSet(const string &filename, unordered_set <string> set) {
@@ -40,10 +38,32 @@ void Crawler::readFileToSet(const string &filename, unordered_set <string> set) 
 }
 
 void Crawler::startCrawl() {
+    for (unordered_set <string>::iterator it = roots.begin(); it != roots.end(); it++) {
+        pool.schedule([] {
+            // cout << "hello" << endl;
+            /*
+            stringstream ss;
+            size_t generatedHash = h(*it);
+            ss << generatedHash;
+            string filename = ss.str();
+            string command = "curl " + *it + " -o " + dataDirectory + "/" + filename.c_str();
+            system(command.c_str());
+            */
+        });
+    }
+}
+
+/*
+void Crawler::startCrawl() {
+    // loop through roots
+    // enqueue roots
+    // register callback functions
+
     cout << "Start Crawl" << endl;
     string command = "curl http://harvix.com -o crawled.txt";
     system(command.c_str());
 }
+*/
 
 void Crawler::endCrawl() {
     cout << "End Crawl" << endl;
