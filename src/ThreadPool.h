@@ -1,3 +1,8 @@
+// Author: David Skrenta CS1300 Fall 2017
+// Recitation: 210 - Arcadia
+// Assignment 8
+// ThreadPool.h
+
 #ifndef THREAD_POOL_H
 #define THREAD_POOL_H
 
@@ -8,32 +13,25 @@
 #include <atomic>
 #include <condition_variable>
 #include <functional>
+#include <chrono>
 
+using namespace std;
 
-/// \brief Use this class to run tasks in parallel.
 class ThreadPool {
     public:
         ThreadPool();
         ThreadPool( size_t threads );
         ~ThreadPool();
 
-        /// \brief Initialize the ThreadPool with a number of threads.
-        /// This method does nothing if the thread pool is already running,
-        /// i.e. ThreadPool( size_t ) was called.
         void initializeWithThreads( size_t threads );
-
-        /// \brief Schedule a task to be executed by a thread immediately.
-        void schedule( const std::function<void()>& );
-
-        /// \brief a blocking function that waits until the threads have processed all the tasks in the queue.
-        void wait() const;
+        void schedule( const function<void()>& );
 
     private:
-        std::vector<std::thread>            _workers;
-        std::queue<std::function<void()>>   _taskQueue;
-        std::atomic_uint                    _taskCount;
-        std::mutex                          _mutex;
-        std::condition_variable             _condition;
-        std::atomic_bool                    _stop;
+        vector <thread> workers;
+        queue <function<void()>> taskQueue;
+        atomic_uint taskCount;
+        mutex _mutex;
+        condition_variable condition;
+        atomic_bool stop;
 };
 #endif // THREAD_POOL_H

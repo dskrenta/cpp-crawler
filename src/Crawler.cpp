@@ -4,7 +4,12 @@
 // Crawler.cpp
 
 #include "Crawler.h"
-#include "ThreadPool.h"
+
+/*
+    Constructor
+    Parameters: url roots, whitelist filename, blacklist filename, destination directory,
+    number of pages to crawl if reached, concurrency limit 
+*/
 
 Crawler::Crawler(
     unordered_set <string> inputRoots,
@@ -21,8 +26,18 @@ Crawler::Crawler(
     startCrawl();
 }
 
+/*
+    Crawler destructor
+*/
+
 Crawler::~Crawler() {
+
 }
+
+/*
+    Reads input file into set
+    Parameters: filename, string set
+*/
 
 void Crawler::readFileToSet(const string &filename, unordered_set <string> set) {
     if (filename.length() > 0) {
@@ -37,32 +52,65 @@ void Crawler::readFileToSet(const string &filename, unordered_set <string> set) 
     }
 }
 
+/*
+    Begins the crawling by scheduling the root urls
+*/
+
 void Crawler::startCrawl() {
     for (unordered_set <string>::iterator it = roots.begin(); it != roots.end(); it++) {
         pool.schedule([this, it] {
-            /*
-            stringstream ss;
-            size_t generatedHash = h(*it);
-            ss << generatedHash;
-            string filename = ss.str();
-            string command = "curl -Ls -o " + this->dataDirectory + "/" + filename.c_str() + " -w 'Downloaded: %{url_effective} \n' " + *it;
-            system(command.c_str());
-            */
             this->crawlTask(*it);
         });
     }
 }
 
+/*
+    Crawls a url with curl and schedules urls found on that page for later crawling
+    Parameters: url
+*/
+
 void Crawler::crawlTask(string url) {
+    this->numPagesCrawled++;
+    seenUrls.insert(url);
     stringstream ss;
     size_t generatedHash = h(url);
     ss << generatedHash;
     string filename = ss.str();
-    // string command = "curl -Ls -o " + this->dataDirectory + "/" + filename.c_str() + " -w 'Downloaded: %{url_effective} \n' " + url;
     string command = "curl -Ls " + url + " | tee " + this->dataDirectory + "/" + filename.c_str();
-    cout << this->exec(command.c_str()) << endl;
-    // system(command.c_str());
+    string body = this->exec(command.c_str());
+    cout << url << endl;
+    smatch sm;
+    const regex r("(http|https)://([\\w_-]+(?:(?:\\.[\\w_-]+)+))([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?");
+    if (regex_search(body, sm, r)) {
+        for (int i = 0; i < sm.size(); i++) {
+            string url = sm[i];
+            unordered_set <string>::iterator it = seenUrls.find(url);
+            if (hostBlacklist.size() > 0 && hostWhitelist.size() > 0) {
+                unordered_set <string>::iterator itBlack = hostBlacklist.find(url);
+                unordered_set <string>::iterator itWhite = hostWhitelist.find(url);
+                if (it == seenUrls.end() && itBlack == hostBlacklist.end() && itWhite != hostWhitelist.end()) {
+                    this->pool.schedule([this, url] {
+                        this->crawlTask(url);
+                    });
+                }
+            }
+            else {
+                if (it == seenUrls.end()) {
+                    this->pool.schedule([this, url] {
+                        this->crawlTask(url);
+                    });
+                }
+            }
+        }
+    }
+    cout << "Crawled " + to_string(numPagesCrawled) + " total web pages. " << endl;
 }
+
+/*
+    Executes bash function and returns standard output as a string
+    Parameters: command
+    Returns: standard output as a string
+*/
 
 string Crawler::exec(const char* cmd) {
     array<char, 128> buffer;
@@ -70,24 +118,9 @@ string Crawler::exec(const char* cmd) {
     shared_ptr<FILE> pipe(popen(cmd, "r"), pclose);
     if (!pipe) throw std::runtime_error("popen() failed!");
     while (!feof(pipe.get())) {
-        if (fgets(buffer.data(), 128, pipe.get()) != nullptr)
+        if (fgets(buffer.data(), 128, pipe.get()) != nullptr) {
             result += buffer.data();
+        }
     }
     return result;
-}
-
-/*
-void Crawler::startCrawl() {
-    // loop through roots
-    // enqueue roots
-    // register callback functions
-
-    cout << "Start Crawl" << endl;
-    string command = "curl http://harvix.com -o crawled.txt";
-    system(command.c_str());
-}
-*/
-
-void Crawler::endCrawl() {
-    cout << "End Crawl" << endl;
 }

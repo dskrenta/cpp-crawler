@@ -15,14 +15,13 @@
 #include <atomic>
 #include <thread>
 #include <sstream>
-
 #include <cstdio>
 #include <memory>
 #include <stdexcept>
 #include <array>
+#include <regex>
 
 #include "ThreadPool.h"
-// #include "WebGraph.h"
 
 using namespace std;
 
@@ -39,14 +38,9 @@ class Crawler {
         ~Crawler();
 
         void readFileToSet(const string &filename, unordered_set <string> set);
-
         void crawlTask(string);
         string exec(const char*);
-
         void startCrawl();
-        void endCrawl();
-        void logCrawlData();
-        void parseUrls(string);
 
     private:
         unordered_set <string> roots;
@@ -55,7 +49,6 @@ class Crawler {
         unordered_set <string> seenUrls;
         queue <string> crawlQueue;
         ThreadPool pool;
-        // WebGraph webGraph;
         atomic <int> numPagesCrawled {0};
         string dataDirectory;
         hash <string> h;

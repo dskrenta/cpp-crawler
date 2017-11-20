@@ -1,63 +1,83 @@
+// Author: David Skrenta CS1300 Fall 2017
+// Recitation: 210 - Arcadia
+// Assignment 8
+// ThreadPool.cpp
+
 #include "ThreadPool.h"
-#include <chrono>
+
+/*
+    Default constructor with basic default data member setups
+*/
 
 ThreadPool::ThreadPool()
-    :   _workers(),
-        _taskQueue(),
-        _taskCount( 0u ),
+    :   workers(),
+        taskQueue(),
+        taskCount(0),
         _mutex(),
-        _condition(),
-        _stop( false ) {}
+        condition(),
+        stop(false) {}
+
+/*
+    Thread pool constructor with number of threads
+    Parameters: threads
+*/
 
 ThreadPool::ThreadPool( size_t threads ) : ThreadPool() {
     initializeWithThreads( threads );
 }
 
+/*
+    Destructor: joins all threads
+*/
+
 ThreadPool::~ThreadPool() {
-    _stop = true;
-    _condition.notify_all();
-    for ( std::thread& w: _workers ) {
+    stop = true;
+    condition.notify_all();
+    for ( thread& w: workers ) {
         w.join();
     }
 }
 
-void ThreadPool::initializeWithThreads( size_t threads ) {
-    for ( size_t i = 0; i < threads; i++ ) {
-        //each thread executes this lambda
-        _workers.emplace_back( [this]() -> void {
+/*
+    Creates worker threads based on the size given from the constructor
+    Parameters: threads
+*/
+
+void ThreadPool::initializeWithThreads(size_t threads) {
+    for (size_t i = 0; i < threads; i++) {
+        workers.emplace_back( [this]() -> void {
             while (true) {
-                std::function<void()> task;
-                {   //acquire lock
-                    std::unique_lock<std::mutex> lock( _mutex );
-                    _condition.wait( lock, [this]() -> bool {
-                        return !_taskQueue.empty() || _stop;
+                function<void()> task;
+                {
+                    unique_lock<mutex> lock( _mutex );
+                    condition.wait( lock, [this]() -> bool {
+                        return !taskQueue.empty() || stop;
                     });
 
-                    if ( _stop && _taskQueue.empty() ) {
+                    if ( stop && taskQueue.empty() ) {
                         return;
                     }
 
-                    task = std::move( _taskQueue.front() );
-                    _taskQueue.pop();
-                }   //release lock
+                    task = move( taskQueue.front() );
+                    taskQueue.pop();
+                }
                 task();
-                _taskCount--;
-            }   //while
+                taskCount--;
+            }
         });
-    }   //for
+    }
 }
 
-void ThreadPool::schedule( const std::function<void()>& task ) {
+/*
+    Schedules a new task by inserting it into the queue
+    Parameters: function to be inserted
+*/
+
+void ThreadPool::schedule(const function<void()>& task) {
     {
-        std::unique_lock<std::mutex> lock( _mutex );
-        _taskQueue.push( task );
+        unique_lock<mutex> lock(_mutex);
+        taskQueue.push(task);
     }
-    _taskCount++;
-    _condition.notify_one();
-}
-
-void ThreadPool::wait() const {
-    while ( _taskCount != 0u ) {
-        std::this_thread::sleep_for( std::chrono::microseconds(1) );
-    }
+    taskCount++;
+    condition.notify_one();
 }
