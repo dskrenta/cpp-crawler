@@ -16,6 +16,11 @@
 #include <thread>
 #include <sstream>
 
+#include <cstdio>
+#include <memory>
+#include <stdexcept>
+#include <array>
+
 #include "ThreadPool.h"
 // #include "WebGraph.h"
 
@@ -34,6 +39,9 @@ class Crawler {
         ~Crawler();
 
         void readFileToSet(const string &filename, unordered_set <string> set);
+
+        void crawlTask(string);
+        string exec(const char*);
 
         void startCrawl();
         void endCrawl();
