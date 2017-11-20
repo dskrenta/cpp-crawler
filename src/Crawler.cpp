@@ -45,7 +45,9 @@ void Crawler::startCrawl() {
             size_t generatedHash = h(*it);
             ss << generatedHash;
             string filename = ss.str();
-            string command = "curl " + *it + " -o " + this->dataDirectory + "/" + filename.c_str();
+            // string command = "curl " + *it + " -o " + this->dataDirectory + "/" + filename.c_str();
+            // curl -Ls -o /dev/null -w %{url_effective} http://google.com
+            string command = "curl -Ls -o " + this->dataDirectory + "/" + filename.c_str() + " -w %{url_effective} " + *it;
             system(command.c_str());
         });
     }
